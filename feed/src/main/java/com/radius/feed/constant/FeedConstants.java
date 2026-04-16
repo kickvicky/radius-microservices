@@ -1,0 +1,15 @@
+package com.radius.feed.constant;
+
+public final class FeedConstants {
+
+    private FeedConstants() {
+        // Prevent instantiation
+    }
+
+    public static final String STATUS_200 = "200";
+    public static final String STATUS_201 = "201";
+    public static final String STATUS_500 = "500";
+
+    public static final String MESSAGE_POST_CREATED = "Post created successfully";
+}
+

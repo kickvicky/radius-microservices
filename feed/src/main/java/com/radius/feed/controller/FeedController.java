@@ -5,6 +5,8 @@ import com.radius.feed.dto.PostDto;
 import com.radius.feed.dto.ResponseDto;
 import com.radius.feed.service.IFeedService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class FeedController {
 
+    private static final Logger log = LoggerFactory.getLogger(FeedController.class);
+
     private IFeedService feedService;
 
     @PostMapping("/post")
@@ -28,8 +32,19 @@ public class FeedController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<PostDto>> fetchAllPosts() {
-        List<PostDto> posts = feedService.fetchAllPosts();
+    public ResponseEntity<List<PostDto>> fetchPosts(
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng) {
+
+        List<PostDto> posts;
+        if (lat != null && lng != null) {
+            log.info("[FeedController] fetchNearbyPosts triggered → lat={}, lng={}, radius=15 miles", lat, lng);
+            posts = feedService.fetchNearbyPosts(lat, lng);
+        } else {
+            log.info("[FeedController] fetchAllPosts triggered → no lat/lng provided");
+            posts = feedService.fetchAllPosts();
+        }
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(posts);

@@ -1,19 +1,26 @@
 server:
   port: 8080
+
 spring:
   application:
     name: feed
+
   datasource:
-    url: jdbc:h2:mem:radiusdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password: ''
-  h2:
-    console:
-      enabled: true
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:radiusdb}
+    driverClassName: org.postgresql.Driver
+    username: ${DB_USERNAME:v0a02tm}
+    password: ${DB_PASSWORD:password}
+
+  sql:
+    init:
+      mode: always          # runs schema.sql on startup (creates PostGIS extension)
+
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: update      # use 'validate' in production with Flyway migrations
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 

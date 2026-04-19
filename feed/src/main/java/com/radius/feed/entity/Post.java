@@ -3,6 +3,7 @@ package com.radius.feed.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -36,11 +37,13 @@ public class Post {
     @Column(length = 50)
     private String tag;
 
-    @Column(nullable = false)
-    private Double latitude;
-
-    @Column(nullable = false)
-    private Double longitude;
+    /**
+     * Geographic location stored as a PostGIS geography point (SRID 4326 = WGS84).
+     * Use ST_DWithin for distance-based queries (returns meters with geography type).
+     * JTS convention: coordinate order is (longitude, latitude).
+     */
+    @Column(nullable = false, columnDefinition = "geography(Point, 4326)")
+    private Point location;
 
     @Builder.Default
     @Column(name = "upvote_count")

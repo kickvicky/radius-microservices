@@ -9,4 +9,6 @@ public interface IFeedService {
     void createPost(PostDto postDto);
 
     List<PostDto> fetchAllPosts();
+
+    List<PostDto> fetchNearbyPosts(Double latitude, Double longitude);
 }

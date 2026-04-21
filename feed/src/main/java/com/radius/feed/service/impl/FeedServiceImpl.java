@@ -1,6 +1,7 @@
 package com.radius.feed.service.impl;
 
 import com.radius.feed.constant.FeedConstants;
+import com.radius.feed.dto.CreatePostRequestDto;
 import com.radius.feed.dto.PostDto;
 import com.radius.feed.entity.Post;
 import com.radius.feed.exception.FeedServiceException;
@@ -14,8 +15,8 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -27,9 +28,25 @@ public class FeedServiceImpl implements IFeedService {
     private PostRepository postRepository;
 
     @Override
-    public void createPost(PostDto postDto) {
-        Post post = PostMapper.mapToPostEntity(postDto);
-        post.setCreatedAt(LocalDateTime.now());
+    public void createPost(CreatePostRequestDto request) {
+        // Build the JTS Point from client-supplied coordinates (lon, lat order for JTS)
+        Point location = GEOMETRY_FACTORY.createPoint(
+                new Coordinate(request.getLongitude(), request.getLatitude())
+        );
+
+        Post post = Post.builder()
+                .userId(UUID.fromString("00000000-0000-0000-0000-000000000001"))  // TODO: replace with JWT principal
+                .userName("anonymous")                                             // TODO: replace with JWT principal
+                .content(request.getContent())
+                .imageUrl(request.getImageUrl())
+                .tag(request.getTag())
+                .location(location)
+                .upvoteCount(0)
+                .downvoteCount(0)
+                .commentCount(0)
+                .isVerified(false)
+                .build();
+
         postRepository.save(post);
     }
 

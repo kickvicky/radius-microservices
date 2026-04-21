@@ -1,12 +1,13 @@
 package com.radius.feed.service;
 
+import com.radius.feed.dto.CreatePostRequestDto;
 import com.radius.feed.dto.PostDto;
 
 import java.util.List;
 
 public interface IFeedService {
 
-    void createPost(PostDto postDto);
+    void createPost(CreatePostRequestDto request);
 
     List<PostDto> fetchAllPosts();
 

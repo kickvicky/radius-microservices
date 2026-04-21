@@ -1,9 +1,11 @@
 package com.radius.feed.controller;
 
 import com.radius.feed.constant.FeedConstants;
+import com.radius.feed.dto.CreatePostRequestDto;
 import com.radius.feed.dto.PostDto;
 import com.radius.feed.dto.ResponseDto;
 import com.radius.feed.service.IFeedService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +26,10 @@ public class FeedController {
     private IFeedService feedService;
 
     @PostMapping("/post")
-    public ResponseEntity<ResponseDto> createPost(@RequestBody PostDto postDto) {
-        feedService.createPost(postDto);
+    public ResponseEntity<ResponseDto> createPost(@Valid @RequestBody CreatePostRequestDto request) {
+        log.info("[FeedController] createPost triggered → content='{}', lat={}, lng={}",
+                request.getContent(), request.getLatitude(), request.getLongitude());
+        feedService.createPost(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(FeedConstants.STATUS_201, FeedConstants.MESSAGE_POST_CREATED));

@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: gateway
+
+  # --- OAuth2 Client Registration ---
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
+server:
+  port: 8080
+  # --- Cookie-Based Session ---
+  # The RADIUS_SESSION cookie is created after Google OAuth2 login and sent
+  # on every subsequent request from the Next.js frontend (localhost:3000).
+  # HttpOnly prevents JS access; SameSite=Lax allows the cookie to be sent
+  # on top-level navigations while blocking cross-site POST requests.
+  servlet:
+    session:
+      cookie:
+        name: RADIUS_SESSION
+        http-only: true
+        same-site: lax

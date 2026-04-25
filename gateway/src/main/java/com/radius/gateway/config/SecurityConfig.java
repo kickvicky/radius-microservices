@@ -2,6 +2,8 @@ package com.radius.gateway.config;
 
 import java.util.List;
 
+import com.radius.gateway.service.RadiusOAuth2UserService;
+import com.radius.gateway.service.RadiusOidcUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,14 +18,26 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  *
  * Flow:
  *  1. User hits any protected endpoint → redirected to Google OAuth2 login.
- *  2. After successful login, a servlet session is created and persisted via
- *     the RADIUS_SESSION cookie (configured in application.yaml).
- *  3. On subsequent requests from the Next.js frontend (localhost:3000),
+ *  2. After successful login, RadiusOAuth2UserService provisions the user
+ *     (first-login insert) and enriches the principal with a
+ *     "radius_username" claim used by downstream services.
+ *  3. A servlet session is created and persisted via the RADIUS_SESSION
+ *     cookie (configured in application.yaml).
+ *  4. On subsequent requests from the Next.js frontend (localhost:3000),
  *     the browser sends the RADIUS_SESSION cookie automatically.
- *  4. FeedProxyController proxies authenticated requests to downstream services.
+ *  5. FeedProxyController proxies authenticated requests to downstream services.
  */
 @Configuration
 public class SecurityConfig {
+
+    private final RadiusOAuth2UserService radiusOAuth2UserService;
+    private final RadiusOidcUserService radiusOidcUserService;
+
+    public SecurityConfig(RadiusOAuth2UserService radiusOAuth2UserService,
+                          RadiusOidcUserService radiusOidcUserService) {
+        this.radiusOAuth2UserService = radiusOAuth2UserService;
+        this.radiusOidcUserService = radiusOidcUserService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,6 +51,14 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("http://localhost:3000/pulse", true)
+                        // Plug in the custom user services so provisioning runs on every
+                        // successful login and the principal carries radius_username.
+                        // .oidcUserService(...)  → covers Google login (uses "openid" scope → OIDC flow)
+                        // .userService(...)      → covers any future non-OIDC OAuth2 providers (e.g. GitHub)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(radiusOidcUserService)
+                                .userService(radiusOAuth2UserService)
+                        )
                 )
                 // IF_REQUIRED: a session is created only when authentication occurs (OAuth2 login).
                 // The RADIUS_SESSION cookie then maintains state for all subsequent requests.

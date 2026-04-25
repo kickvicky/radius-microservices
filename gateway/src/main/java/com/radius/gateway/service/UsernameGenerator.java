@@ -7,11 +7,11 @@ import java.security.SecureRandom;
 import java.util.List;
 
 /**
- * Generates Radius-style usernames in the pattern {Adjective}-{Noun}-{Number}
- * (e.g. "Spicy-Briyani-404").
+ * Generates Radius-style usernames in the pattern {Adjective}-{Animal}-{Number}
+ * (e.g. "Spicy-Falcon-404").
  *
- * With 12 adjectives × 12 nouns × 900 numbers (100–999) the keyspace is
- * ~129,600 combinations per run, which is plenty for small-to-mid scale.
+ * With 20 adjectives × 20 animals × 900 numbers (100–999) the keyspace is
+ * 360,000 combinations per run, which is plenty for small-to-mid scale.
  * A collision-retry loop (bounded by MAX_ATTEMPTS) falls back to a longer
  * numeric suffix in the rare case a unique handle cannot be found quickly.
  */
@@ -21,13 +21,15 @@ public class UsernameGenerator {
     private static final List<String> ADJECTIVES = List.of(
             "Spicy", "Crispy", "Cheesy", "Tangy", "Smoky",
             "Fluffy", "Mighty", "Silent", "Cosmic", "Electric",
-            "Golden", "Swift"
+            "Golden", "Swift", "Brave", "Stealthy", "Wild",
+            "Noble", "Frosty", "Shadow", "Crimson", "Stormy"
     );
 
-    private static final List<String> NOUNS = List.of(
-            "Briyani", "Samosa", "Paneer", "Falcon", "Tiger",
-            "Panda", "Phoenix", "Rocket", "Ninja", "Wizard",
-            "Dragon", "Comet"
+    private static final List<String> ANIMALS = List.of(
+            "Falcon", "Tiger", "Panda", "Phoenix", "Eagle",
+            "Wolf", "Otter", "Raven", "Lynx", "Hawk",
+            "Fox", "Owl", "Leopard", "Jaguar", "Heron",
+            "Bear", "Sparrow", "Cheetah", "Lion", "Stork"
     );
 
     private static final int MAX_ATTEMPTS = 10;
@@ -61,8 +63,8 @@ public class UsernameGenerator {
 
     private String buildUsername(int numberBound, int offset) {
         String adjective = ADJECTIVES.get(random.nextInt(ADJECTIVES.size()));
-        String noun = NOUNS.get(random.nextInt(NOUNS.size()));
+        String animal = ANIMALS.get(random.nextInt(ANIMALS.size()));
         int number = random.nextInt(numberBound) + offset;
-        return adjective + "-" + noun + "-" + number;
+        return adjective + "-" + animal + "-" + number;
     }
 }

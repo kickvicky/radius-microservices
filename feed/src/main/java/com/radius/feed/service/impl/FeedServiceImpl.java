@@ -28,15 +28,19 @@ public class FeedServiceImpl implements IFeedService {
     private PostRepository postRepository;
 
     @Override
-    public void createPost(CreatePostRequestDto request) {
+    public void createPost(CreatePostRequestDto request, UUID userId, String userName) {
         // Build the JTS Point from client-supplied coordinates (lon, lat order for JTS)
         Point location = GEOMETRY_FACTORY.createPoint(
                 new Coordinate(request.getLongitude(), request.getLatitude())
         );
 
+        // userId and userName arrive from the gateway via X-Radius-User-Id and
+        // X-Radius-Username headers. The gateway's SecurityFilterChain guarantees
+        // these are populated from a valid OAuth2 principal before the request
+        // is proxied here.
         Post post = Post.builder()
-                .userId(UUID.fromString("00000000-0000-0000-0000-000000000001"))  // TODO: replace with JWT principal
-                .userName("anonymous")                                             // TODO: replace with JWT principal
+                .userId(userId)
+                .userName(userName)
                 .content(request.getContent())
                 .imageUrl(request.getImageUrl())
                 .tag(request.getTag())

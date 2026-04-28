@@ -39,6 +39,9 @@ public class RadiusOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     /** Custom claim key exposed on the authenticated principal. */
     public static final String RADIUS_USERNAME_ATTRIBUTE = "radius_username";
 
+    /** Custom claim key for the internal Radius user UUID. */
+    public static final String RADIUS_USER_ID_ATTRIBUTE = "radius_user_id";
+
     private static final String SUB_ATTRIBUTE = "sub";
     private static final String EMAIL_ATTRIBUTE = "email";
     private static final String DEFAULT_ROLE = "ROLE_USER";
@@ -73,6 +76,7 @@ public class RadiusOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // Clone attributes so we don't mutate the immutable map returned by DefaultOAuth2UserService.
         Map<String, Object> enrichedAttributes = new HashMap<>(oauth2User.getAttributes());
         enrichedAttributes.put(RADIUS_USERNAME_ATTRIBUTE, user.getUsername());
+        enrichedAttributes.put(RADIUS_USER_ID_ATTRIBUTE, user.getId().toString());
 
         return new DefaultOAuth2User(
                 Set.of(new SimpleGrantedAuthority(DEFAULT_ROLE)),

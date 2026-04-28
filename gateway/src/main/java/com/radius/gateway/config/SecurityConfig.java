@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("http://localhost:3000/pulse", true)
+                        .defaultSuccessUrl("http://localhost:3000", true)
                         // Plug in the custom user services so provisioning runs on every
                         // successful login and the principal carries radius_username.
                         // .oidcUserService(...)  → covers Google login (uses "openid" scope → OIDC flow)

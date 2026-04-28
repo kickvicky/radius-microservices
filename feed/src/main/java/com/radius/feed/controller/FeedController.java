@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -26,10 +27,14 @@ public class FeedController {
     private IFeedService feedService;
 
     @PostMapping("/post")
-    public ResponseEntity<ResponseDto> createPost(@Valid @RequestBody CreatePostRequestDto request) {
-        log.info("[FeedController] createPost triggered → content='{}', lat={}, lng={}",
-                request.getContent(), request.getLatitude(), request.getLongitude());
-        feedService.createPost(request);
+    public ResponseEntity<ResponseDto> createPost(
+            @Valid @RequestBody CreatePostRequestDto request,
+            @RequestHeader("X-Radius-User-Id") UUID userId,
+            @RequestHeader("X-Radius-Username") String userName) {
+
+        log.info("[FeedController] createPost triggered → user='{}' ({}) content='{}', lat={}, lng={}",
+                userName, userId, request.getContent(), request.getLatitude(), request.getLongitude());
+        feedService.createPost(request, userId, userName);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(FeedConstants.STATUS_201, FeedConstants.MESSAGE_POST_CREATED));

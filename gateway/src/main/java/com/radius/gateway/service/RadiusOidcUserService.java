@@ -37,6 +37,9 @@ public class RadiusOidcUserService extends OidcUserService {
     /** Custom claim key exposed on the authenticated principal. */
     public static final String RADIUS_USERNAME_ATTRIBUTE = "radius_username";
 
+    /** Custom claim key for the internal Radius user UUID. */
+    public static final String RADIUS_USER_ID_ATTRIBUTE = "radius_user_id";
+
     private static final String SUB_ATTRIBUTE = "sub";
     private static final String DEFAULT_ROLE = "ROLE_USER";
 
@@ -74,6 +77,7 @@ public class RadiusOidcUserService extends OidcUserService {
             enrichedClaims.putAll(oidcUser.getUserInfo().getClaims());
         }
         enrichedClaims.put(RADIUS_USERNAME_ATTRIBUTE, user.getUsername());
+        enrichedClaims.put(RADIUS_USER_ID_ATTRIBUTE, user.getId().toString());
 
         OidcUserInfo enrichedUserInfo = new OidcUserInfo(enrichedClaims);
 
